@@ -1,0 +1,241 @@
+---
+title: "EDA"
+author: "Anh Chi Tuan"
+date: "2025-11-02"
+output: html_document
+---
+
+# Preparation
+
+```{r}
+# Load library
+library(sf) # spatial data, for geojson
+library(dplyr) # filter data
+library(corrplot) # For calculating the matrix
+library(ggplot2) # For plotting the base heatmap
+library(plotly)  # For interactivity
+library(tidyr) # For data wrangling
+library(glmnet)
+library(Matrix) # Used by glmnet
+library(rpart)
+library(rpart.plot)
+```
+
+```{r}
+# Read data
+geojson_path <- "E:/Bayesian-Statistics-Project/data/merged_ecec_province.geojson"
+my_sf <- read_sf(geojson_path)
+```
+
+```{r, echo=FALSE}
+# Plot
+plot(my_sf, max.plot=1)
+```
+
+```{r, echo=FALSE}
+selected_provinces <- c("MI") 
+selected_sf <- my_sf %>%
+  filter(prov_sigla %in% selected_provinces)
+plot(selected_sf, max.plot = 1)
+```
+
+```{r}
+num_df <- my_sf %>% st_drop_geometry() %>%
+  select(prov_sigla, prov_type, rip_code, reg_code, 16:last_col())
+head(num_df)
+```
+
+??? There are many zero-values in the dataframe!??! Are these truly zeros or null?!
+
+Assumption: These data are collected reasonably =\> There is no outlier, therefore, I don't deal with outliers.
+
+# Correlation
+
+```{r}
+# 2. Calculate the Correlation Matrix
+cor_matrix <- cor(num_df[5:ncol(num_df)], use = "pairwise.complete.obs")
+
+cor_df <- as.data.frame(cor_matrix)
+cor_df$Var1 <- rownames(cor_df)
+
+# Use tidyr::pivot_longer to convert it to a long format
+cor_long <- cor_df %>%
+  tidyr::pivot_longer(cols = -Var1, 
+                      names_to = "Var2", 
+                      values_to = "Correlation") %>%
+  # Filter to show only the upper triangle (optional, but good practice)
+  filter(as.numeric(factor(Var1)) < as.numeric(factor(Var2)))
+
+
+# --- 3. Create the Base Heatmap using ggplot2 ---
+
+p <- ggplot(cor_long, aes(x = Var1, y = Var2, fill = Correlation, text = round(Correlation, 2))) +
+  # Use geom_tile to create the color blocks
+  geom_tile(color = "white", linewidth = 0.5) +
+  
+  # Add the correlation value as text in the center of the tile
+  geom_text(aes(label = round(Correlation, 2)), size = 2) +
+  
+  # Set a divergent color scale (common for correlation)
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                       midpoint = 0, limit = c(-1, 1), name = "Correlation") +
+  
+  # Improve labels and theme
+  labs(title = "Interactive Correlation Matrix", x = "", y = "") +
+  theme_minimal() +
+  # Rotate X axis labels for readability
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # Enforce square aspect ratio
+  coord_fixed()
+
+# --- 4. Convert the ggplot object to an Interactive Plotly object ---
+
+# Use the 'tooltip' argument to display the exact correlation value on hover
+interactive_plot <- ggplotly(p, tooltip = c("Var1", "Var2", "text"))
+
+# Display the interactive plot
+interactive_plot
+```
+
+```{r}
+# Set your desired correlation threshold (e.g., 0.7 for strong correlation)
+threshold <- 0.7
+
+# Convert the correlation matrix to a standard data frame
+cor_df <- as.data.frame(cor_matrix)
+
+# Use the column names as a vector of feature names
+features <- colnames(cor_matrix)
+
+# Find the indices of correlations >= threshold AND exclude self-correlations (i < j)
+# We use the 'upper.tri' function to only look at the upper triangle of the matrix 
+# (to avoid duplicates and self-correlations)
+high_cor_indices <- which(upper.tri(cor_matrix, diag = FALSE) & (cor_matrix >= threshold), arr.ind = TRUE)
+
+# --- 3. Extract and Display Pairs ---
+
+# Extract the pairs and their correlation values
+highly_correlated_pairs <- data.frame(
+  Feature1 = features[high_cor_indices[, 1]],
+  Feature2 = features[high_cor_indices[, 2]],
+  Correlation = cor_matrix[high_cor_indices]
+) %>%
+  # Arrange by correlation value, descending
+  arrange(desc(Correlation))
+
+# Print the resulting table
+cat(paste("--- Pairs with Correlation >= ", threshold, " ---\n"))
+print(highly_correlated_pairs)
+cat("---------------------------------------------------\n")
+```
+
+# Simple linear model
+
+```{r}
+# Try to fit with a linear model
+lm_df <- num_df[3:ncol(num_df)]
+lm_df$rip_code <- as.factor(lm_df$rip_code)
+lm_df$reg_code <- as.factor(lm_df$reg_code)
+lm_df$urban_type <- as.factor(lm_df$urban_type)
+linear_model <- lm(fem_empl_rate ~ -1 + . + rip_code:reg_code, data = lm_df)
+# summary(linear_model)
+
+# Coefficients: (81 not defined because of singularities)
+# => first, not consider reg_code and interaction rip_code and reg_code
+
+linear_model <- lm(fem_empl_rate ~ -1 + . - reg_code, data = lm_df)
+#summary(linear_model)
+# => fem_house_rate can be removed
+# 1. From model stats, p-value = 1.7e-09
+# 2. Come back and check correlation, cor(inact_rate,fem_house_rate)>0.7
+
+linear_model <- lm(fem_empl_rate ~ -1 + . - reg_code - fem_house_rate - empl_rate- unempl_rate - private_coverage, data = lm_df)
+summary(linear_model)
+```
+
+```{r}
+plot(linear_model)
+```
+
+The simple linear model seems reasonable to some extent (based on residual vs fitted and qq plot) (satisfies the hypothesis of normality)
+
+# Linear model with Lasso
+
+```{r}
+formula <- as.formula(fem_empl_rate ~ -1 + . - reg_code)
+
+# Y: Response Vector
+Y <- lm_df$fem_empl_rate
+
+# X: Predictor Matrix
+# The -1 removes the intercept, aligning with the LASSO practice of standardizing predictors.
+X <- model.matrix(formula, data = lm_df)[, -1]
+```
+
+```{r}
+# Find Optimal Lambda (Tuning) using Cross-Validation
+cv_lasso <- cv.glmnet(
+  x = X, 
+  y = Y, 
+  alpha = 1,       # alpha = 1 specifies LASSO (L1 regularization)
+  nfolds = 3      # Use 3-fold cross-validation
+)
+
+# Store the best lambda value found by cross-validation
+# lambda.min gives the lambda with the smallest Mean Squared Error (MSE)
+best_lambda <- cv_lasso$lambda.min
+plot(cv_lasso)
+```
+
+```{r}
+# Fit the final LASSO Model using the best lambda
+lasso_model <- glmnet(
+  x = X,
+  y = Y,
+  alpha = 1,
+  lambda = best_lambda
+)
+
+# Extract the non-zero coefficients
+lasso_coefficients <- coef(lasso_model)
+
+# Convert to a data frame and filter for non-zero (selected) predictors
+selected_predictors <- as.data.frame(as.matrix(lasso_coefficients)) %>%
+  tibble::rownames_to_column(var = "Predictor") %>%
+  rename(Coefficient = s0) %>%
+  filter(Coefficient != 0)
+
+cat("--- LASSO Selected Predictors and Coefficients (at Lambda =", round(best_lambda, 5), ") ---\n")
+print(selected_predictors)
+cat("----------------------------------------------------------------------------------------\n")
+```
+
+# Decision Tree
+
+```{r}
+dt_model <- rpart(
+  formula,
+  data = lm_df,
+  method = "anova",
+  control = rpart.control(cp = 0.001) # Optionally lower complexity parameter for a larger tree
+)
+
+# --- 5. Print the Text Summary and Model Details ---
+print("--- Text Summary of Decision Tree Splits ---")
+print(dt_model)
+
+```
+
+```{r}
+rpart.plot(dt_model,
+           type = 4,           # Draw the split labels closer to the split
+           extra = 1,          # Display the number of observations at the node
+           main = "Simple Regression Decision Tree for Female Employment Rate",
+           box.palette = "Blues", 
+           shadow.col = "gray"
+           )
+```
+
+```{r}
+dt_model$variable.importance
+```

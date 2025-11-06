@@ -1,0 +1,5 @@
+Base of the code is eda_luca.ipynb
+
+Added ECEC specific variables from Tommi's notebook
+    - Fixed the boxplot to account for different scales.
+    - Note about part_rate

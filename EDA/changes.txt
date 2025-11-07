@@ -3,3 +3,10 @@ Base of the code is eda_luca.ipynb
 Added ECEC specific variables from Tommi's notebook
     - Fixed the boxplot to account for different scales.
     - Note about part_rate
+
+Added difference analysis from Paul's notebook
+    - changed plot of occupation by unifying the scales
+
+From Chi's input:
+    - Investigated a bit deeper the 0 in our variables
+

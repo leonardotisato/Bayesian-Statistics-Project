@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import geopandas as gpd
+import numpy as np
 from string_matching import string_matching
 
 pd.set_option('display.max_rows', None)
@@ -61,4 +62,23 @@ work_rates = work_rates.rename(columns={'Maschi': 'wr_men',
 # merge with EDA dataset
 merged_df = df_eda.merge(work_rates, left_on='prov_name', right_on='clean_province', how='left')
 
+### ADD OTHER DATA
+# ECEC diffusion
+ecec_diffusion = pd.read_excel('../data/add_data/additional_health_data.xls', header=7, sheet_name='Ind. 142_P')
+ecec_diffusion.rename(columns={'Unnamed: 1':"prov"}, inplace=True)
+ecec_diffusion = ecec_diffusion[['prov', 2022]]
+
+ecec_diffusion.dropna(inplace=True)
+
+health_match = string_matching(list(ecec_diffusion['prov']), list(df_eda['prov_name']), 90)
+ecec_diffusion['prov'] = ecec_diffusion['prov'].map(health_match)
+ecec_diffusion.dropna(inplace=True)
+ecec_diffusion.rename(columns={2022: 'ecec_diffusion'}, inplace=True)
+
+
+merged_df = merged_df.merge(ecec_diffusion, left_on='prov_name', right_on='prov', how='left')
+
+merged_df.drop(['prov_y','clean_province'], axis=1, inplace=True)
+
+merged_df.to_file('../data/extra_data.geojson', driver='GeoJSON')
 

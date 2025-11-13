@@ -23,6 +23,4 @@ def string_matching(dirty_list, clean_list, acceptance_threshold):
 
     # --- 3. Apply the Mapping ---
 
-    # --- FIX 2 (The Critical One) ---
-    # Create a new column 'clean_province' in the work_rates DataFrame
     return mapping

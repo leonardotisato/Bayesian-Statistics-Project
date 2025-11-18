@@ -5,10 +5,10 @@ def string_matching(dirty_list, clean_list, acceptance_threshold):
     unmatched = []
     
     for dirty in dirty_list:
-        # Find the single best match from the clean list
+        # find best match
         match, score = process.extractOne(dirty, clean_list)
         
-        # If the score is high enough, add it to our mapping
+        # check best match score against threshold
         if score >= acceptance_threshold:
             mapping[dirty] = match
         else:
@@ -16,11 +16,9 @@ def string_matching(dirty_list, clean_list, acceptance_threshold):
 
     if unmatched:
         print("\n--- Unmatched Names (and their best guess) ---")
-        # --- FIX 1 ---
+        
         print(f"[Note: {len(unmatched)} items were not matched because they were below the {acceptance_threshold}% threshold]")
         for item in unmatched:
             print(f"  - '{item[0]}' -> best guess '{item[1]}' (Score: {item[2]})")
-
-    # --- 3. Apply the Mapping ---
 
     return mapping

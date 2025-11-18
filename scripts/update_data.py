@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 import geopandas as gpd
-import numpy as np
 from string_matching import string_matching
 
 pd.set_option('display.max_rows', None)
@@ -24,9 +23,6 @@ work_rates = work_rates.pivot_table( # from long to wide format
 work_rates['Territorio'].nunique() # 132 instad of 107 provinces
 # we have more observations than expected, and some weird names
 
-# merge fuzzy strings
-
-
 # check differences between our data and the new one
 prov_eda = df_eda['prov_name'].unique()
 prov_rates = work_rates['Territorio'].unique()
@@ -34,14 +30,10 @@ prov_rates = work_rates['Territorio'].unique()
 # match the province names
 matching_provinces = string_matching(prov_rates, prov_eda, 90)
 
-# --- 3. Apply the Mapping ---
 
-# --- FIX 2 (The Critical One) ---
-# Create a new column 'clean_province' in the work_rates DataFrame
 work_rates['clean_province'] = work_rates['Territorio'].map(matching_provinces)
 
-# Print the work_rates DataFrame to see the new column
-work_rates
+work_rates # check results 
 
 # Both Reggio di Calabria and Calabria are passed as Calabria
 # Friuli Venezia Giulia is passed as Venezia
@@ -80,5 +72,7 @@ merged_df = merged_df.merge(ecec_diffusion, left_on='prov_name', right_on='prov'
 
 merged_df.drop(['prov_y','clean_province'], axis=1, inplace=True)
 
-merged_df.to_file('../data/extra_data.geojson', driver='GeoJSON')
+merged_df.columns
+merged_df.empl_gap = (merged_df.wr_women / merged_df.wr_men).round(1)
 
+merged_df.to_file('../data/updated_data.geojson', driver='GeoJSON')

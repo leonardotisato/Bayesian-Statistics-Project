@@ -1,3 +1,7 @@
 \Bayesian-Statistics-Project.code-workspace
 
 \.venv
+scripts/__pycache__
+.Rhistory
+.RData
+.Ruserdata

@@ -75,4 +75,13 @@ merged_df.drop(['prov_y','clean_province'], axis=1, inplace=True)
 merged_df.columns
 merged_df.empl_gap = (merged_df.wr_women / merged_df.wr_men).round(1)
 
-merged_df.to_file('../data/updated_data.geojson', driver='GeoJSON')
+#merged_df.to_file('../data/updated_data.geojson', driver='GeoJSON')
+
+# transform ecec diffusion to numeric -> Bolzano is NA
+merged_df['ecec_diffusion'] = pd.to_numeric(merged_df['ecec_diffusion'], errors='coerce')
+merged_df.set_index('prov_name', inplace=True)
+updated_csv = merged_df.select_dtypes(include=['number'])
+
+# export CSV
+updated_csv.to_csv('../data/updated_data.csv', index=True)
+new_data = pd.read_csv('../data/updated_data.csv', index_col=0) # use prov name as index

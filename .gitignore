@@ -1,7 +1,13 @@
+# Project specific stuff
 \Bayesian-Statistics-Project.code-workspace
-
 \.venv
+
+# python stuff
 scripts/__pycache__
+*.pyc
+EDA/__pycache__
+
+# R stuff
 .Rhistory
 .RData
 .Ruserdata

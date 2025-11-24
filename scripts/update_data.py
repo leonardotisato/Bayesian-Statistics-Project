@@ -84,27 +84,34 @@ updated_csv = merged_df.select_dtypes(include=['number'])
 
 # export CSV
 #updated_csv.to_csv('../data/updated_data.csv', index=True)
-new_data = pd.read_csv('../data/updated_data.csv', index_col=0) # use prov name as index
 
 # duplicate columns
 prob_columns = ['wr_tot','wr_women']
-new_data[prob_columns]
-new_data.drop(prob_columns, axis=1, inplace=True)
+updated_csv[prob_columns]
+updated_csv
+updated_csv.drop(prob_columns, axis=1, inplace=True)
 
-new_data['empl_gap'] = (new_data['fem_empl_rate'] / new_data['wr_men']).round(2)
-new_data['empl_gap']
+updated_csv['empl_gap'] = (updated_csv['fem_empl_rate'] / updated_csv['wr_men']).round(2)
+updated_csv['empl_gap']
 
-new_data[['fem_empl_rate','wr_men','empl_gap']]
-#new_data.to_csv('../data/updated_data.csv', index=True)
+updated_csv[['fem_empl_rate','wr_men','empl_gap']]
+updated_csv.columns
+updated_csv.to_csv('../data/updated_data.csv', index=True)
 
 
-gdf = gpd.read_file('../data/updated_data.geojson', driver='GeoJSON')
+gdf = gpd.read_file('../data/updated_data.geojson')
 
-extra_cols = set(gdf.columns) - set(new_data.columns)
-useless_cols = ['prov_area_code', 'prov_code','prov_type','prov_x', 'reg_code', 'rip_name','wr_women', 'wr_tot']
+extra_cols = set(gdf.columns) - set(updated_csv.columns)
+useless_cols = ['rip_code', 'prov_area_code', 'prov_code','prov_type','prov_x', 'reg_code', 'rip_code','wr_women', 'wr_tot']
 gdf.drop(useless_cols, axis=1, inplace=True)
 gdf['empl_gap'] = (gdf['fem_empl_rate'] / gdf['wr_men']).round(2)
 
-gdf.drop(['rip_code','prov_name_upper', 'prov_name_lower',], axis=1, inplace=True)
+gdf.drop(['rip_code','reg_code','prov_code','prov_area_code','prov_type'], axis=1, inplace=True)
+gdf['empl_gap'] = (gdf['fem_empl_rate'] / gdf['mal_empl_rate']).round(2)
 
-#gdf.to_file('../data/updated_data.geojson', driver='GeoJSON')
+gdf.to_file('../data/updated_data.geojson', driver='GeoJSON')
+
+
+
+
+

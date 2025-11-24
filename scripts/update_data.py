@@ -83,5 +83,35 @@ merged_df.set_index('prov_name', inplace=True)
 updated_csv = merged_df.select_dtypes(include=['number'])
 
 # export CSV
+#updated_csv.to_csv('../data/updated_data.csv', index=True)
+
+# duplicate columns
+prob_columns = ['wr_tot','wr_women']
+updated_csv[prob_columns]
+updated_csv
+updated_csv.drop(prob_columns, axis=1, inplace=True)
+
+updated_csv['empl_gap'] = (updated_csv['fem_empl_rate'] / updated_csv['wr_men']).round(2)
+updated_csv['empl_gap']
+
+updated_csv[['fem_empl_rate','wr_men','empl_gap']]
+updated_csv.columns
 updated_csv.to_csv('../data/updated_data.csv', index=True)
-new_data = pd.read_csv('../data/updated_data.csv', index_col=0) # use prov name as index
+
+
+gdf = gpd.read_file('../data/updated_data.geojson')
+
+extra_cols = set(gdf.columns) - set(updated_csv.columns)
+useless_cols = ['rip_code', 'prov_area_code', 'prov_code','prov_type','prov_x', 'reg_code', 'rip_code','wr_women', 'wr_tot']
+gdf.drop(useless_cols, axis=1, inplace=True)
+gdf['empl_gap'] = (gdf['fem_empl_rate'] / gdf['wr_men']).round(2)
+
+gdf.drop(['rip_code','reg_code','prov_code','prov_area_code','prov_type'], axis=1, inplace=True)
+gdf['empl_gap'] = (gdf['fem_empl_rate'] / gdf['mal_empl_rate']).round(2)
+
+gdf.to_file('../data/updated_data.geojson', driver='GeoJSON')
+
+
+
+
+

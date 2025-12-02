@@ -1,0 +1,53 @@
+\documentclass[12pt,aspectratio=169]{beamer}
+\usetheme{aurigapolimi}
+
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+% % % % METADATA % % % % % % % % % % % % 
+
+\title{Clustering of Spatial Data}
+\subtitle{An application to early childhood education and care
+services and their impact on women’s labour market}
+\author{
+  Tommaso Baresi, 
+  Luca Perego, 
+  Paul Poupeau, \\
+  Leonardo Tisato,
+  Alexis Toppé,
+  Anh Chi Tuan} 
+
+\institute{28\textsuperscript{\tiny{th}} of November 2025 }
+\setaurigadate{}
+\selectcolor{deepBluePolimi} % lighter polimi blue also available (bluePolimi)
+
+
+% = = = = = = = = = = = = = = = = = = = =
+% Set up logos = = = = = = = = = = = = =
+% = = = = = = = = = = = = = = = = = = = =
+
+% Title-page logos
+\setaurigatitlelogoA{logos/polimi_logo.eps}
+\setaurigatitlelogoheightA{1.5cm}
+
+%\setaurigatitlelogoB{logos/uab_text.eps}
+%\setaurigatitlelogoheightB{1.8cm}
+
+% Slide logos
+\setaurigalogoA{logos/polimi_logo.eps}
+\setaurigalogoheightA{0.5cm}
+
+%\setaurigalogoB{logos/}
+\setaurigalogoheightB{}
+
+\begin{document}
+\aurigatitleframe
+\include{slides/0_introduction}
+\include{slides/1_dataset}
+\include{slides/2_eda}
+\include{slides/3_var_selection}
+\include{slides/4_car_model}
+\include{slides/5_future_steps}
+\include{slides/6_bibliography}
+\include{slides/7_annexes}
+\end{document}
+

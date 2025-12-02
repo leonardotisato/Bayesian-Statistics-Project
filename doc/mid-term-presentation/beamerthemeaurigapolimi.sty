@@ -1,0 +1,261 @@
+% =====================================================================
+%  polimi auriga
+%  Auriga theme with Polimi characteristics
+% =====================================================================
+\ProvidesPackage{beamerthemeaurigapolimi}[2025/11/18 Auriga custom theme]
+
+% =====================================================================
+% Dependencies
+% =====================================================================
+\RequirePackage{etoolbox}
+\RequirePackage{graphicx}
+\RequirePackage{exscale}
+\RequirePackage{ragged2e}
+\RequirePackage{changepage}
+\RequirePackage{fontspec}
+\RequirePackage{xpatch}
+\RequirePackage{tikz}
+\usetikzlibrary{decorations.pathreplacing, calc}
+\RequirePackage{xcolor}
+\RequirePackage{pgfplots}
+\RequirePackage{fancyvrb}
+% \RequirePackage{enumitem} % DISABLED to fix Beamer bullets
+
+% =====================================================================
+% Fonts
+% =====================================================================
+\newfontfamily\Raleway[Ligatures=TeX]{Raleway}
+\newfontfamily\Lato[Ligatures=TeX]{Lato}
+
+\usefonttheme{professionalfonts}
+
+\setsansfont{Lato}[
+  UprightFont=*-Regular,
+  ItalicFont=*-Italic,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldItalic
+]
+\setmonofont{Hack}
+
+% Explicitly apply fonts to specific Beamer elements
+\setbeamerfont{title}{family=\Raleway,size=\Large,series=\bfseries}
+\setbeamerfont{subtitle}{family=\Raleway,size=\normalsize,series=\mdseries}
+\setbeamerfont{author}{family=\Lato,size=\small}
+\setbeamerfont{institute}{family=\Lato,size=\footnotesize}
+\setbeamerfont{date}{family=\Lato,size=\footnotesize}
+
+\setbeamerfont{frametitle}{family=\Raleway,size=\Large,series=\bfseries}
+\setbeamerfont{caption}{size=\footnotesize}
+
+% =====================================================================
+% Colors
+% =====================================================================
+\definecolor{deepBluePolimi}{RGB}{31,48,83}
+\definecolor{bluePolimi}{RGB}{114,143,165}
+\definecolor{red}{RGB}{181,23,0}
+\definecolor{blue}{RGB}{0,118,186}
+\definecolor{gray}{RGB}{146,146,146}
+
+% --- DYNAMIC COLOR LOGIC ---
+\colorlet{aurigaPrimary}{bluePolimi}
+
+\newcommand{\selectcolor}[1]{%
+  \colorlet{aurigaPrimary}{#1}
+}
+
+% 1. HEADLINE COLORS
+\setbeamercolor{section in head/foot}{bg=aurigaPrimary, fg=white}
+\setbeamercolor{section in head/foot shaded}{bg=aurigaPrimary, fg=white!50!gray} 
+% (I tweaked 'shaded' so inactive sections are still visible on the colored background)
+
+\setbeamerfont{section in head/foot}{series=\bfseries}
+\setbeamerfont{section in head/foot shaded}{series=\mdseries}
+
+% 2. TITLE COLORS
+\setbeamercolor{title}{fg=aurigaPrimary}
+\setbeamercolor{subtitle}{fg=black}
+\setbeamercolor{author}{fg=aurigaPrimary}
+\setbeamercolor{institute}{fg=black}
+
+% 3. FRAMETITLE COLORS (UPDATED FOR BAND LOOK)
+% We set the Background (bg) to the primary color and Text (fg) to white
+\setbeamercolor{frametitle}{bg=aurigaPrimary, fg=white}
+
+% =====================================================================
+% Itemize spacing & Colors
+% =====================================================================
+\setbeamertemplate{itemize item}[circle]
+\setbeamertemplate{itemize subitem}[circle]
+\setbeamertemplate{itemize subsubitem}[circle]
+
+\setbeamercolor{itemize item}{fg=aurigaPrimary}
+\setbeamercolor{itemize subitem}{fg=aurigaPrimary}
+\setbeamercolor{itemize subsubitem}{fg=aurigaPrimary}
+
+\xpatchcmd{\itemize}
+  {\def\makelabel}
+  {\ifnum\@itemdepth=1\relax
+     \setlength\itemsep{1ex}% Space between items
+     \setlength\topsep{1.7ex}%  Space BEFORE the list starts
+   \else
+     \ifnum\@itemdepth=2\relax
+       \setlength\itemsep{0.5ex}%
+     \else
+       \ifnum\@itemdepth=3\relax
+         \setlength\itemsep{0.5ex}%
+   \fi\fi\fi\def\makelabel}
+  {} {}
+
+% =====================================================================
+% Equation / caption spacing
+% =====================================================================
+\setlength\belowdisplayshortskip{2ex}
+\setlength{\abovecaptionskip}{2ex}
+\setlength{\belowcaptionskip}{1ex}
+
+\setbeamertemplate{caption}{
+  {\usebeamerfont{caption}\insertcaption}
+}
+
+% =====================================================================
+% Suppress navigation symbols
+% =====================================================================
+\beamertemplatenavigationsymbolsempty
+
+% =====================================================================
+% Title-page logos (0–2) & Custom Date
+% =====================================================================
+\newcommand{\aurigatitlelogoA}{}
+\newcommand{\aurigatitlelogoB}{}
+\newcommand{\aurigatitlelogoheightA}{2.2cm}
+\newcommand{\aurigatitlelogoheightB}{2.2cm}
+\newcommand{\aurigadate}{}
+
+\newcommand{\setaurigatitlelogoA}[1]{\renewcommand{\aurigatitlelogoA}{#1}}
+\newcommand{\setaurigatitlelogoB}[1]{\renewcommand{\aurigatitlelogoB}{#1}}
+\newcommand{\setaurigatitlelogoheightA}[1]{\renewcommand{\aurigatitlelogoheightA}{#1}}
+\newcommand{\setaurigatitlelogoheightB}[1]{\renewcommand{\aurigatitlelogoheightB}{#1}}
+\newcommand{\setaurigadate}[1]{\renewcommand{\aurigadate}{#1}}
+
+% =====================================================================
+% Slide logos (0–2)
+% =====================================================================
+\newcommand{\aurigalogoA}{}
+\newcommand{\aurigalogoB}{}
+\newcommand{\aurigalogoheightA}{0.8cm}
+\newcommand{\aurigalogoheightB}{0.8cm}
+
+\newcommand{\setaurigalogoA}[1]{\renewcommand{\aurigalogoA}{#1}}
+\newcommand{\setaurigalogoB}[1]{\renewcommand{\aurigalogoB}{#1}}
+\newcommand{\setaurigalogoheightA}[1]{\renewcommand{\aurigalogoheightA}{#1}}
+\newcommand{\setaurigalogoheightB}[1]{\renewcommand{\aurigalogoheightB}{#1}}
+
+% =====================================================================
+% Headline (section navigation bar)
+% =====================================================================
+\setbeamertemplate{headline}{%
+  \nointerlineskip % Ensure no vertical gap above
+  \begin{beamercolorbox}[wd=\paperwidth,ht=3ex,dp=1ex,leftskip=1em,rightskip=1em]{section in head/foot}
+    \insertsectionnavigationhorizontal{\paperwidth}{\hfill}{\hfill}%
+  \end{beamercolorbox}%
+}
+
+% =====================================================================
+% Footline for regular slides
+% =====================================================================
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=1.5cm,dp=1ex]{footline}%
+    \hbox to \paperwidth{%
+      \ifdefempty{\aurigalogoB}{%
+         % CASE 1: Single Logo
+         \hfill 
+         \raisebox{0.5cm}[0pt][0pt]{%
+            \ifdefempty{\aurigalogoA}{}{%
+              \includegraphics[height=\aurigalogoheightA]{\aurigalogoA}%
+            }%
+         }%
+         \hspace{0.5cm}
+      }{%
+         % CASE 2: Two Logos
+         \hfill
+         \raisebox{0.5cm}[0pt][0pt]{%
+            \ifdefempty{\aurigalogoA}{}{%
+              \includegraphics[height=\aurigalogoheightA]{\aurigalogoA}%
+            }%
+            \hspace{0.4cm}%
+            \includegraphics[height=\aurigalogoheightB]{\aurigalogoB}%
+         }%
+         \hfill
+      }%
+      \usebeamerfont{page number in head/foot}%
+      \insertframenumber\kern1em
+    }%
+  \end{beamercolorbox}%
+}
+
+% =====================================================================
+% Frame title (MODIFIED FOR HEADER BAND)
+% =====================================================================
+\setbeamertemplate{frametitle}{
+    \nointerlineskip % Kills the white gap between Headline and Frametitle
+    % The beamercolorbox creates the colored band. 
+    % 'sep' adds padding inside the color.
+    \begin{beamercolorbox}[wd=\paperwidth, sep=1.5ex]{frametitle}
+        \usebeamerfont{frametitle}\insertframetitle
+    \end{beamercolorbox}
+}
+
+% =====================================================================
+% Custom TITLE FRAME
+% =====================================================================
+\newcommand{\aurigatitleframe}{%
+  {%
+    \setbeamertemplate{headline}{}%
+    \setbeamertemplate{footline}{}%
+
+    \begin{frame}[plain]
+      \begin{tikzpicture}[remember picture,overlay]
+
+        % --- Custom Date (Top Right)
+        \ifdefempty{\aurigadate}{}{%
+          \node[anchor=north east, xshift=-0.5cm, yshift=-0.5cm] at (current page.north east) {%
+             \usebeamerfont{date}\aurigadate%
+          };
+        }
+
+        % --- Logos block (Anchored South)
+        \node[anchor=south, yshift=0.5cm] (logos) at (current page.south) {%
+          \begin{minipage}{\linewidth}
+            \centering
+            \ifdefempty{\aurigatitlelogoA}{}{%
+              \includegraphics[height=\aurigatitlelogoheightA]{\aurigatitlelogoA}%
+            }
+            \ifdefempty{\aurigatitlelogoB}{}{%
+              \hspace{1.2cm}%
+              \includegraphics[height=\aurigatitlelogoheightB]{\aurigatitlelogoB}%
+            }
+          \end{minipage}
+        };
+
+        % --- Title block (Anchored North)
+        \node[anchor=north, yshift=-1.5cm] at (current page.north) {%
+          \begin{minipage}[t][0.65\paperheight][t]{0.9\linewidth}
+            \centering
+            {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}
+            \vspace{0.75em}
+            {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}
+            \vspace{1.5em}
+            {\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor\par}
+            \vspace{0.5em}
+            {\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute\par}
+          \end{minipage}
+        };
+
+      \end{tikzpicture}
+    \end{frame}
+  }%
+}
+
+% =====================================================================
+% End of theme
+% =====================================================================

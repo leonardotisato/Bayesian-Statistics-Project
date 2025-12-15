@@ -4,26 +4,26 @@ namespace car_leroux_model_model_namespace {
 using stan::model::model_base_crtp;
 using namespace stan::math;
 stan::math::profile_map profiles__;
-static constexpr std::array<const char*, 35> locations_array__ =
+static constexpr std::array<const char*, 37> locations_array__ =
   {" (found before start of program)",
-  " (in 'car_leroux_model.stan', line 14, column 2 to column 17)",
-  " (in 'car_leroux_model.stan', line 15, column 2 to column 14)",
-  " (in 'car_leroux_model.stan', line 16, column 2 to column 22)",
-  " (in 'car_leroux_model.stan', line 17, column 2 to column 20)",
-  " (in 'car_leroux_model.stan', line 20, column 2 to column 29)",
-  " (in 'car_leroux_model.stan', line 26, column 2 to column 23)",
-  " (in 'car_leroux_model.stan', line 27, column 2 to column 23)",
+  " (in 'car_leroux_model.stan', line 16, column 2 to column 17)",
+  " (in 'car_leroux_model.stan', line 17, column 2 to column 14)",
+  " (in 'car_leroux_model.stan', line 18, column 2 to column 22)",
+  " (in 'car_leroux_model.stan', line 19, column 2 to column 20)",
+  " (in 'car_leroux_model.stan', line 22, column 2 to column 29)",
   " (in 'car_leroux_model.stan', line 28, column 2 to column 23)",
-  " (in 'car_leroux_model.stan', line 31, column 2 to column 25)",
-  " (in 'car_leroux_model.stan', line 38, column 2 to column 57)",
-  " (in 'car_leroux_model.stan', line 42, column 4 to column 73)",
-  " (in 'car_leroux_model.stan', line 41, column 2 to line 42, column 73)",
-  " (in 'car_leroux_model.stan', line 45, column 4 to column 21)",
-  " (in 'car_leroux_model.stan', line 46, column 4 to column 21)",
-  " (in 'car_leroux_model.stan', line 47, column 4 to column 46)",
-  " (in 'car_leroux_model.stan', line 44, column 23 to line 48, column 3)",
-  " (in 'car_leroux_model.stan', line 44, column 2 to line 48, column 3)",
-  " (in 'car_leroux_model.stan', line 51, column 2 to column 34)",
+  " (in 'car_leroux_model.stan', line 29, column 2 to column 23)",
+  " (in 'car_leroux_model.stan', line 30, column 2 to column 23)",
+  " (in 'car_leroux_model.stan', line 33, column 2 to column 25)",
+  " (in 'car_leroux_model.stan', line 40, column 2 to column 57)",
+  " (in 'car_leroux_model.stan', line 44, column 4 to column 73)",
+  " (in 'car_leroux_model.stan', line 43, column 2 to line 44, column 73)",
+  " (in 'car_leroux_model.stan', line 47, column 4 to column 21)",
+  " (in 'car_leroux_model.stan', line 48, column 4 to column 21)",
+  " (in 'car_leroux_model.stan', line 49, column 4 to column 46)",
+  " (in 'car_leroux_model.stan', line 46, column 23 to line 50, column 3)",
+  " (in 'car_leroux_model.stan', line 46, column 2 to line 50, column 3)",
+  " (in 'car_leroux_model.stan', line 53, column 2 to column 45)",
   " (in 'car_leroux_model.stan', line 2, column 2 to column 17)",
   " (in 'car_leroux_model.stan', line 3, column 2 to column 17)",
   " (in 'car_leroux_model.stan', line 4, column 9 to column 10)",
@@ -31,27 +31,31 @@ static constexpr std::array<const char*, 35> locations_array__ =
   " (in 'car_leroux_model.stan', line 5, column 9 to column 10)",
   " (in 'car_leroux_model.stan', line 5, column 12 to column 13)",
   " (in 'car_leroux_model.stan', line 5, column 2 to column 17)",
-  " (in 'car_leroux_model.stan', line 7, column 2 to column 23)",
-  " (in 'car_leroux_model.stan', line 8, column 8 to column 15)",
-  " (in 'car_leroux_model.stan', line 8, column 2 to column 36)",
-  " (in 'car_leroux_model.stan', line 9, column 8 to column 15)",
-  " (in 'car_leroux_model.stan', line 9, column 2 to column 36)",
-  " (in 'car_leroux_model.stan', line 10, column 8 to column 9)",
-  " (in 'car_leroux_model.stan', line 10, column 2 to column 38)",
-  " (in 'car_leroux_model.stan', line 14, column 9 to column 10)",
-  " (in 'car_leroux_model.stan', line 15, column 9 to column 10)"};
+  " (in 'car_leroux_model.stan', line 7, column 9 to column 10)",
+  " (in 'car_leroux_model.stan', line 7, column 2 to column 21)",
+  " (in 'car_leroux_model.stan', line 9, column 2 to column 23)",
+  " (in 'car_leroux_model.stan', line 10, column 8 to column 15)",
+  " (in 'car_leroux_model.stan', line 10, column 2 to column 36)",
+  " (in 'car_leroux_model.stan', line 11, column 8 to column 15)",
+  " (in 'car_leroux_model.stan', line 11, column 2 to column 36)",
+  " (in 'car_leroux_model.stan', line 12, column 8 to column 9)",
+  " (in 'car_leroux_model.stan', line 12, column 2 to column 38)",
+  " (in 'car_leroux_model.stan', line 16, column 9 to column 10)",
+  " (in 'car_leroux_model.stan', line 17, column 9 to column 10)"};
 class car_leroux_model_model final : public model_base_crtp<car_leroux_model_model> {
  private:
   int N;
   int P;
   Eigen::Matrix<double,-1,1> y_data__;
   Eigen::Matrix<double,-1,-1> X_data__;
+  Eigen::Matrix<double,-1,1> x_offset_data__;
   int N_edges;
   std::vector<int> node1;
   std::vector<int> node2;
   std::vector<int> num_neighbors;
   Eigen::Map<Eigen::Matrix<double,-1,1>> y{nullptr, 0};
   Eigen::Map<Eigen::Matrix<double,-1,-1>> X{nullptr, 0, 0};
+  Eigen::Map<Eigen::Matrix<double,-1,1>> x_offset{nullptr, 0};
  public:
   ~car_leroux_model_model() {}
   car_leroux_model_model(stan::io::var_context& context__, unsigned int
@@ -135,47 +139,67 @@ class car_leroux_model_model final : public model_base_crtp<car_leroux_model_mod
         }
       }
       current_statement__ = 26;
+      stan::math::validate_non_negative_index("x_offset", "N", N);
+      current_statement__ = 27;
+      context__.validate_dims("data initialization", "x_offset", "double",
+        std::vector<size_t>{static_cast<size_t>(N)});
+      x_offset_data__ = Eigen::Matrix<double,-1,1>::Constant(N,
+                          std::numeric_limits<double>::quiet_NaN());
+      new (&x_offset)
+        Eigen::Map<Eigen::Matrix<double,-1,1>>(x_offset_data__.data(), N);
+      {
+        std::vector<local_scalar_t__> x_offset_flat__;
+        current_statement__ = 27;
+        x_offset_flat__ = context__.vals_r("x_offset");
+        pos__ = 1;
+        for (int sym1__ = 1; sym1__ <= N; ++sym1__) {
+          stan::model::assign(x_offset, x_offset_flat__[(pos__ - 1)],
+            "assigning variable x_offset", stan::model::index_uni(sym1__));
+          pos__ = (pos__ + 1);
+        }
+      }
+      current_statement__ = 28;
       context__.validate_dims("data initialization", "N_edges", "int",
         std::vector<size_t>{});
       N_edges = std::numeric_limits<int>::min();
-      current_statement__ = 26;
-      N_edges = context__.vals_i("N_edges")[(1 - 1)];
-      current_statement__ = 26;
-      stan::math::check_greater_or_equal(function__, "N_edges", N_edges, 1);
-      current_statement__ = 27;
-      stan::math::validate_non_negative_index("node1", "N_edges", N_edges);
       current_statement__ = 28;
+      N_edges = context__.vals_i("N_edges")[(1 - 1)];
+      current_statement__ = 28;
+      stan::math::check_greater_or_equal(function__, "N_edges", N_edges, 1);
+      current_statement__ = 29;
+      stan::math::validate_non_negative_index("node1", "N_edges", N_edges);
+      current_statement__ = 30;
       context__.validate_dims("data initialization", "node1", "int",
         std::vector<size_t>{static_cast<size_t>(N_edges)});
       node1 = std::vector<int>(N_edges, std::numeric_limits<int>::min());
-      current_statement__ = 28;
-      node1 = context__.vals_i("node1");
-      current_statement__ = 28;
-      stan::math::check_greater_or_equal(function__, "node1", node1, 1);
-      current_statement__ = 29;
-      stan::math::validate_non_negative_index("node2", "N_edges", N_edges);
       current_statement__ = 30;
+      node1 = context__.vals_i("node1");
+      current_statement__ = 30;
+      stan::math::check_greater_or_equal(function__, "node1", node1, 1);
+      current_statement__ = 31;
+      stan::math::validate_non_negative_index("node2", "N_edges", N_edges);
+      current_statement__ = 32;
       context__.validate_dims("data initialization", "node2", "int",
         std::vector<size_t>{static_cast<size_t>(N_edges)});
       node2 = std::vector<int>(N_edges, std::numeric_limits<int>::min());
-      current_statement__ = 30;
-      node2 = context__.vals_i("node2");
-      current_statement__ = 30;
-      stan::math::check_greater_or_equal(function__, "node2", node2, 1);
-      current_statement__ = 31;
-      stan::math::validate_non_negative_index("num_neighbors", "N", N);
       current_statement__ = 32;
+      node2 = context__.vals_i("node2");
+      current_statement__ = 32;
+      stan::math::check_greater_or_equal(function__, "node2", node2, 1);
+      current_statement__ = 33;
+      stan::math::validate_non_negative_index("num_neighbors", "N", N);
+      current_statement__ = 34;
       context__.validate_dims("data initialization", "num_neighbors", "int",
         std::vector<size_t>{static_cast<size_t>(N)});
       num_neighbors = std::vector<int>(N, std::numeric_limits<int>::min());
-      current_statement__ = 32;
+      current_statement__ = 34;
       num_neighbors = context__.vals_i("num_neighbors");
-      current_statement__ = 32;
+      current_statement__ = 34;
       stan::math::check_greater_or_equal(function__, "num_neighbors",
         num_neighbors, 0);
-      current_statement__ = 33;
+      current_statement__ = 35;
       stan::math::validate_non_negative_index("beta", "P", P);
-      current_statement__ = 34;
+      current_statement__ = 36;
       stan::math::validate_non_negative_index("u", "N", N);
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -269,8 +293,9 @@ class car_leroux_model_model final : public model_base_crtp<car_leroux_model_mod
         }
         current_statement__ = 18;
         lp_accum__.add(stan::math::normal_lpdf<propto__>(y,
-                         stan::math::add(stan::math::multiply(X, beta), u),
-                         sigma));
+                         stan::math::add(
+                           stan::math::add(stan::math::multiply(X, beta), u),
+                           x_offset), sigma));
       }
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -358,8 +383,9 @@ class car_leroux_model_model final : public model_base_crtp<car_leroux_model_mod
         }
         current_statement__ = 18;
         lp_accum__.add(stan::math::normal_lpdf<propto__>(y,
-                         stan::math::add(stan::math::multiply(X, beta), u),
-                         sigma));
+                         stan::math::add(
+                           stan::math::add(stan::math::multiply(X, beta), u),
+                           x_offset), sigma));
       }
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);

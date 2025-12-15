@@ -4,6 +4,8 @@ data {
   vector[N] y;
   matrix[N, P] X;
 
+  vector[N] x_offset;
+
   int<lower=1> N_edges;
   array[N_edges] int<lower=1> node1;
   array[N_edges] int<lower=1> node2;
@@ -48,5 +50,5 @@ model {
   }
 
   // Likelihood
-  y ~ normal(X * beta + u, sigma);
+  y ~ normal(X * beta + u + x_offset, sigma);
 }

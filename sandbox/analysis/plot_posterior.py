@@ -185,17 +185,46 @@ X = X_standardized.values            # Shape: (N, P)
 
 # posterior mean of Y
 y_post_means = alphas[:, None] + np.dot(betas, X.T) + phis
+y_post_means.shape
 
-plt.hist(y_post_means[1], bins=100) # plot of a signle province
+##### VISUALISE RESULTS: 3 plots #####
 
-## PLOT MULTIPLE Ys
+### 1. plot the posterior density of y in n random iterations, each line is one iteration
 plt.figure(figsize=(10, 6))
 
-# Plot 50 versions of the "Cleaned" Structural Mixture
-for i in np.random.choice(8000, 107):
+# Plot 100 versions of the "Cleaned" Structural Mixture
+n_iterations = 100
+for i in np.random.choice(8000, n_iterations):
     sns.kdeplot(y_post_means[i, :], color="forestgreen", alpha=0.2, linewidth=1)
-
-# Plot the noisy original data
-plt.title("Structural Mean ($\mu$) vs Observed Data ($Y$)")
+plt.title(f"Mean of Y across {n_iterations} posterior iterations")
 plt.legend()
 plt.show()
+
+### 2. plot the posterior mean density across all iterations (the average value of the green lines above)
+plt.figure(figsize=(10, 6))
+sns.kdeplot(y_post_means.flatten(), color="forestgreen", linewidth=2, label="Average Posterior Structural Distribution")
+# observed data data
+sns.kdeplot(y, color="black", linewidth=2, linestyle="--", label="Observed Data (Y)")
+
+plt.title("Average density across iterations")
+plt.legend()
+plt.show()
+
+### 3. compute the mean for each province first, across the 8000 iterations, and then plot them
+province_means = y_post_means.mean(axis=0) 
+sns.kdeplot(province_means, color="red", label="Distribution of Province-Specific Means")
+
+
+##### VISUALISE THE "CLUSTERS" #####
+low_threshold = -0.6 # checked by viz 2 and viz 3 (above)
+high_threshold = 0.0 # checked by viz 2 and viz 3
+def identify_clusters(val):
+  if val < low_threshold:
+    return 'low employment'
+  elif val < high_threshold:
+    return 'medium employment'
+  else:
+    return 'high employment'
+
+gdf['cluster'] = province_means
+gdf['cluster_label'] = gdf['cluster'].apply(identify_clusters)

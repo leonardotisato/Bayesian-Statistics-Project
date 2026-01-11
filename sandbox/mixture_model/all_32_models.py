@@ -242,34 +242,34 @@ transformed data {
     # Alpha priors
     if cluster_alpha:
         model_lines.append("  for (k in 1:K) {")
-        model_lines.append("    alpha[k] ~ normal(0, 1);")
+        model_lines.append("    alpha[k] ~ normal(0, 2);")
         model_lines.append("  }")
     else:
-        model_lines.append("  alpha ~ normal(0, 1);")
+        model_lines.append("  alpha ~ normal(0, 2);")
     
     # Beta priors
     if cluster_beta:
         model_lines.append("  for (k in 1:K) {")
         model_lines.append("    for (j in 1:P) {")
-        model_lines.append("      beta[k, j] ~ normal(0, 1);")
+        model_lines.append("      beta[k, j] ~ normal(0, 3);")
         model_lines.append("    }")
         model_lines.append("  }")
     else:
         model_lines.append("  for (j in 1:P) {")
-        model_lines.append("    beta[j] ~ normal(0, 1);")
+        model_lines.append("    beta[j] ~ normal(0, 3);")
         model_lines.append("  }")
     
     # Sigma priors
     if cluster_sigma:
         model_lines.append("  for (k in 1:K) {")
-        model_lines.append("    sigma[k] ~ normal(0, 1);")
+        model_lines.append("    sigma[k] ~ inv_gamma(2, 1);")
         model_lines.append("  }")
     else:
-        model_lines.append("  sigma ~ normal(0, 1);")
+        model_lines.append("  sigma ~ inv_gamma(2, 1);")
     
     # Spatial priors
     if spatial:
-        model_lines.append("  tau2 ~ gamma(2, 0.5);")
+        model_lines.append("  tau2 ~ gamma(2, 1);")
         model_lines.append("  rho ~ beta(1, 1);")
         model_lines.append("  phi ~ car_leroux(tau2, rho, W, D, lambda, N);")
     
@@ -554,7 +554,7 @@ def config_to_string(config):
 
 def main():
     """Main execution function."""
-    for c in [1, 2, 3, 4, 5]:  # Run for K=2, 3, 4, and 5
+    for c in [2, 3]:  # Run for K=2, 3, 4, and 5
         print(f"\n\nRunning all models for K={c} clusters")
         
         print("="*70)

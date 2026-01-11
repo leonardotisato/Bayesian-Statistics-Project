@@ -13,3 +13,9 @@ EDA/__pycache__
 .Ruserdata
 .Rproj.user
 Bayesian-Statistics-Project.Rproj
+
+
+# Stan code and executables
+*.exe
+*.stan
+*.pkl

@@ -15,7 +15,7 @@ except NameError:
 
 all_data = []
 # Skip K=1 (trivially produces 1 cluster with binder_loss=0)
-for k in range(2, 6):
+for k in range(2, 4):
     for cov_type in ['full', 'cov']:
         suffix = '' if cov_type == 'full' else '_cov'
         filepath = os.path.join(base_dir, f'summary_{k}{suffix}.csv')

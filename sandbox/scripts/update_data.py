@@ -111,7 +111,5 @@ gdf['empl_gap'] = (gdf['fem_empl_rate'] / gdf['mal_empl_rate']).round(2)
 
 gdf.to_file('../data/updated_data.geojson', driver='GeoJSON')
 
-
-
-
-
+### ADDUTION: INACTIVITY RATES
+inactivity = pd.read_csv('../data/add_data/inactivity_rates.csv')

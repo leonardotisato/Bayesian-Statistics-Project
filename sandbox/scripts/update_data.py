@@ -111,5 +111,49 @@ gdf['empl_gap'] = (gdf['fem_empl_rate'] / gdf['mal_empl_rate']).round(2)
 
 gdf.to_file('../data/updated_data.geojson', driver='GeoJSON')
 
-### ADDUTION: INACTIVITY RATES
-inactivity = pd.read_csv('../data/add_data/inactivity_rates.csv')
+### ADDITION: INACTIVITY RATES
+
+inactivity = pd.read_csv('../../data/add_data/inactivity_rates.csv')
+
+wom_inact_rates = inactivity.loc[
+    (inactivity['TIME_PERIOD']==2022) & (inactivity['SEX']==2),
+    ['Osservazione', 'Territorio']]
+
+data = gpd.read_file('../../data/updated_data.geojson')
+PROV = data['prov_name'].unique()
+inact_prov = wom_inact_rates['Territorio'].unique()
+inact_matching = string_matching(PROV, inact_prov, 90)
+
+
+wom_inact_rates['clean_province'] = wom_inact_rates['Territorio'].map(inact_matching)
+
+wom_inact_rates.loc[:,['clean_province','Territorio']]
+wom_inact_rates.loc[
+    wom_inact_rates['clean_province'] != wom_inact_rates['Territorio'],
+    ['clean_province','Territorio']]
+
+pd.set_option('display.max_rows', None)
+wom_inact_rates.loc[wom_inact_rates['clean_province'].isna()]
+missing = ['L\'Aquila', 'Massa Carrara', 'Forli\'-Cesena', 'Reggio nell\'Emilia','Trento','Bolzano','Aosta']
+data.loc[data['prov_name'].isin(missing)]
+
+updates = {123 : "Aosta",
+        361 : "Bolzano",
+        375 : "Trento",
+        571 : "Reggio nell\'Emilia",
+        641 : 'Forli\'-Cesena',
+        669 : 'Massa Carrara',
+        977 : "L\'Aquila" 
+        }
+wom_inact_rates.loc[updates.keys(), 'clean_province'] = list(updates.values())
+
+wom_inact_rates.loc
+
+wom_inact_rates = wom_inact_rates.rename(columns={'clean_province': 'prov_name', 
+                                            'Osservazione': 'inactive_women_20_64'})
+wom_inact_rates.drop('Territorio', axis=1, inplace=True)
+wom_inact_rates
+# merge with EDA dataset
+merged_df = data.merge(wom_inact_rates, left_on='prov_name', right_on='prov_name', how='left')
+merged_df['inactive_women_20_64'].isna().sum()
+merged_df.to_file('../../data/updated_data_v2.geojson', driver='GeoJSON')

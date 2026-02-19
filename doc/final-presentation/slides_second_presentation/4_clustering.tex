@@ -1,0 +1,74 @@
+\begin{section}{Clustering}
+\begin{frame}{Sparse Finite Mixture Model}
+\tiny
+\begin{align*}
+y_i^\ast \mid \alpha,\boldsymbol{\pi},\{\boldsymbol{\beta}_k,\sigma_k^2\}_{k=1}^K,\phi_i
+&\sim \sum_{k=1}^K \pi_k\,
+\mathcal{N}\!\Big(\alpha+\mathbf{x}_i^{\ast\top}\boldsymbol{\beta}_k+\phi_i,\ \sigma_k^2\Big),
+\qquad i=1,\dots,N\\
+\boldsymbol{\pi} &\sim \mathrm{Dirichlet}\!\big(0.5\,\mathbf{1}_K\big),\\
+\alpha &\sim \mathcal{N}(0,2),\\
+\beta_{j,k}\mid b_{j,k},\lambda_{j}
+&\stackrel{\text{ind}}{\sim} \mathcal{N}\!\Big(b_{j,k},\ \lambda_{j} \Big),
+\qquad j=1,\dots,P,\ k=1,\dots,K\\
+b_{j} &\stackrel{\text{iid}}{\sim} \mathcal{N}(0,1),
+\qquad j=1,\dots,P\\
+\lambda_{j} &\stackrel{\text{iid}}{\sim} \mathrm{Gamma}(0.5,0.5), \,
+\qquad j=1,\dots,P\\
+\sigma^2_k = \frac{1}{\nu_k}, \qquad \nu_k &\stackrel{\text{iid}}{\sim} \mathrm{Gamma}(2,1),
+\qquad k=1,\dots,K\\
+\phi_i &= \phi_{\mathrm{raw},i}-\frac1N\sum_{i'=1}^N \phi_{\mathrm{raw},i'},
+\qquad i=1,\dots,N\\
+\boldsymbol{\phi}_{\mathrm{raw}}\mid \tau,\rho,W
+&\sim \mathcal{N}_N\!\Big(
+\mathbf{0},\ \big[\tau\{\rho(D-W)+(1-\rho)I_N\}\big]^{-1}
+\Big),\\
+\tau &\sim \mathrm{Gamma}(2,1),\\
+\rho &\sim \mathrm{Beta}(1,1).
+\end{align*}
+
+\end{frame}
+
+\begin{frame}{Label Assignment}
+\footnotesize
+   \begin{itemize}
+      \item \textbf{Latent labels:} for each province $i$, $z_i \in \{1,\dots,K\}$.
+      \item \textbf{Component mean:} $\mu_{ik} = \alpha + {x_i^*}^\top \beta_k + \phi_i$.
+      \item \textbf{Allocation weights:} $w_{ik} = \pi_k \, \mathcal{N}\!\left(y_i^* \mid \mu_{ik}, \sigma_k^2\right)$,\quad
+            $r_{ik} = \dfrac{w_{ik}}{\sum_{h=1}^K w_{ih}}$.
+      \item \textbf{Sampling step:} $z_i \mid r_i \sim \text{Categorical}(r_i)$ (one label vector per posterior draw).
+      \item \textbf{Posterior Similarity Matrix (PSM):} $S_{ii'} = \Pr(z_i = z_{i'} \mid \text{data}) \approx \frac{1}{M}\sum_{m=1}^M \mathbb{I}\!\left(z_i^{(m)}=z_{i'}^{(m)}\right)$.
+      \item \textbf{Point estimate of the partition (Binder loss):} choose $\hat z$ minimizing
+            $\sum_{i<i'} \left[a\, S_{ii'}\,\mathbb{I}(\hat z_i \neq \hat z_{i'}) + b\, (1-S_{ii'})\,\mathbb{I}(\hat z_i = \hat z_{i'})\right]$.
+      \item \textbf{Output:} $\hat z$ gives the final cluster labels used for interpretation.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Estimate cluster-specific coefficients}
+\tiny
+\begin{align*}
+y_i^\ast \mid \alpha,\boldsymbol{\beta}_{c_i},\phi_i,\sigma_{c_i}
+&\stackrel{\text{ind}}{\sim} \mathcal{N}\!\Big(\alpha+\mathbf{x}_i^{\ast\top}\boldsymbol{\beta}_{c_i}+\phi_i,\ \sigma_{c_i}^{2}\Big),
+\qquad i=1,\dots,N\\
+\alpha &\sim \mathcal{N}(0,2),\\
+\beta_{j,c}\mid b_{j,c},\lambda_{j}
+&\stackrel{\text{ind}}{\sim} \mathcal{N}\!\Big(b_{j,c},\ \lambda_{j} \Big),
+\qquad j=1,\dots,P,\ c=1,\dots,C\\
+b_{j,c} &\stackrel{\text{iid}}{\sim} \mathcal{N}(0,1),
+\qquad j=1,\dots,P,\ c = 1,\dots,C\\
+\lambda_{j} &\stackrel{\text{iid}}{\sim} \mathrm{Gamma}(0.5,0.5), \,
+\qquad j=1,\dots,P\\
+\sigma^2_c = \frac{1}{\nu_c}, \qquad \nu_c &\stackrel{\text{iid}}{\sim} \mathrm{Gamma}(2,1),
+\qquad c=1,\dots,C\\
+\phi_i &= \phi_{\mathrm{raw},i}-\frac1N\sum_{i'=1}^N \phi_{\mathrm{raw},i'} \, ,
+\qquad i=1,\dots,N\\
+\boldsymbol{\phi}_{\mathrm{raw}}\mid \tau,\rho,W
+&\sim \mathcal{N}_N\!\Big(
+\mathbf{0},\ \big[\tau\{\rho(D-W)+(1-\rho)I_N\}\big]^{-1}
+\Big),\\
+\tau &\sim \mathrm{Gamma}(2,1),\\
+\rho &\sim \mathrm{Beta}(1,1).
+\end{align*}
+\end{frame}
+
+\end{section}

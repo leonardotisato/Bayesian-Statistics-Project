@@ -1,0 +1,68 @@
+\newpage
+\section*{Appendix B: CAR Leroux prior in Stan}\label{ann:lpdf_car}
+
+Since the proper CAR Leroux prior is not directly available in \texttt{Stan}, we implement it by explicitly defining its log probability density function (lpdf). In this appendix, we derive the expression of the lpdf corresponding to the CAR Leroux prior, defined as:
+\[
+\boldsymbol{\phi}_{\mathrm{raw}} \mid \tau,\rho,W
+\sim \mathcal{N}_N\!\Big(
+\mathbf{0},\ 
+\big[\tau\{\rho(D-W)+(1-\rho)I_N\}\big]^{-1}
+\Big),
+\]
+where $W$ denotes the adjacency matrix, $D$ is the diagonal matrix of neighborhood counts,\\
+i.e. $D_{ii}=\sum_j W_{ij}$, $\tau$ is the precision parameter, and $\rho\in[0,1]$ controls the degree of spatial dependence.\\
+
+Define the matrices $V=\rho(D-W)+(1-\rho)I_N$ and $Q=\tau V$.
+Then, the CAR Leroux prior can be written as:
+\[
+\boldsymbol{\phi} \mid \tau,\rho,W
+\sim \mathcal{N}_N\!\left(\mathbf{0},\, Q^{-1}\right).
+\]
+The corresponding density is:
+\[
+\pi(\boldsymbol{\phi} \mid W,\tau,\rho)
+= (2\pi)^{-N/2}\det(Q)^{1/2}
+\exp\!\left(-\tfrac12 \boldsymbol{\phi}^\top Q \boldsymbol{\phi}\right).
+\]
+Ignoring constants that do not depend on the parameters, the log-density is proportional to:
+\begin{align}
+\log \pi(\boldsymbol{\phi} \mid W,\tau,\rho)
+&\propto \tfrac12 \log \det(Q)
+- \tfrac12 \boldsymbol{\phi}^\top Q \boldsymbol{\phi} \nonumber\\
+&= \tfrac12 \log \det(\tau V)
+- \tfrac{\tau}{2}\boldsymbol{\phi}^\top V \boldsymbol{\phi} \nonumber\\
+&= \tfrac{N}{2}\log(\tau)
++ \tfrac12 \log \det(V)
+- \tfrac{\tau}{2}\boldsymbol{\phi}^\top V \boldsymbol{\phi}.
+\label{eq:log_density_car}
+\end{align}
+
+We now derive an expression for $\det(V)$.
+Since $D-W$ is symmetric, it admits the eigendecomposition:
+\[
+D-W = U \Lambda U^\top,
+\]
+where $U$ is orthogonal and $\Lambda=\mathrm{diag}(\lambda_1,\dots,\lambda_N)$.
+Therefore:
+\[
+V=\rho(D-W)+(1-\rho)I_N
+=U\big(\rho\Lambda+(1-\rho)I_N\big)U^\top.
+\]
+Hence, the eigenvalues of $V$ are $\rho\lambda_i+(1-\rho)$, $i=1,\dots,N$, and we define the following result for $det(V)$:
+\begin{equation}
+\det(V)
+= \prod_{i=1}^N \big(\rho\lambda_i + 1-\rho\big).
+\label{eq:detV}
+\end{equation}
+
+Substituting Eq.\eqref{eq:detV} into Eq.\eqref{eq:log_density_car}, we obtain
+\begin{align}
+\log \pi(\boldsymbol{\phi} \mid W,\tau,\rho)
+&\propto
+\tfrac{N}{2}\log(\tau)
++ \tfrac12 \sum_{i=1}^N \log\big(\rho\lambda_i + 1-\rho\big)
+- \tfrac{\tau}{2}\boldsymbol{\phi}^\top V \boldsymbol{\phi}.
+\label{eq:log_density_final}
+\end{align}
+
+Equation Eq.\eqref{eq:log_density_final} is implemented in \texttt{Stan} to define the custom lpdf for the CAR Leroux prior.

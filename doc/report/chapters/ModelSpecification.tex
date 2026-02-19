@@ -1,0 +1,140 @@
+\section{Model Specification}
+\label{sec:models}
+In this section, we introduce the Bayesian hierarchical model that allows for the study of spatial dependencies and uncovers the underlying clustering structure of areal data. The former is achieved by including spatial random effects via a CAR prior, while the latter is achieved by using finite mixtures with the number of components deliberately set high and a sparse prior on the weights favoring few non-empty components.
+
+\subsection{Label Assignment}
+\label{subsec:Label-Assignment}
+
+The clustering model used in this study follows the idea of model-based clustering via sparse finite mixture models proposed by \cite{Malsiner-Walli2014}. Spatial heterogeneity is modeled by assuming that the regression coefficients take only a few distinct values across space. These distinct values define clusters of locations with similar covariate effects. The prior is designed to favor a small number of non-empty clusters, even when the upper bound on the number of mixture components is large.\\
+
+We adopt a Gaussian likelihood for the logit-transformed employment rate $y^*$. Specifically, we consider a finite mixture model with $K$ components, where each component $k$ is characterized by its own regression coefficients $\beta_k$ and variance $\sigma_k^2$. A Dirichlet prior with concentration parameter smaller than one is assigned to the vector of mixture weights $\pi$, encouraging sparsity in the mixture distribution. As a result, the posterior typically allocates mass to only a subset of the $K$ components. Finally, a spatial random effect $\phi_i$ is included to account for residual spatial autocorrelation through a CAR-Leroux prior\footnote{CAR prior distribution implementation in Stan is presented in Appendix B.}. The mean-centering constraint is employed since it helps avoid an identifiability issue (confounding) with the intercept \citep{duncan2024developing}.\\
+
+Let $i=1,\dots,N$ index observations, $j=1,\dots,P$ covariates, and $k=1,\dots,K$ mixture components. Let $\mathbf{x}_i^\ast \in \mathbb{R}^P$ be the $i$-th row of $X^\ast$, and $y_i^\ast$ the logit transformed response. Define the known graph matrix $W\in[0,1]^{N\times N}$ and degree matrix $D=\mathrm{diag}(d_1,\dots,d_N)$ with $d_i=\sum_{i'=1}^N W_{ii'}$.
+
+\begin{align*}
+y_i^\ast \mid \alpha,\boldsymbol{\pi},\{\boldsymbol{\beta}_k,\sigma_k^2\}_{k=1}^K,\phi_i
+&\stackrel{\text{ind}}{\sim} \sum_{k=1}^K \pi_k\,
+\mathcal{N}\!\Big(\alpha+\mathbf{x}_i^{\ast\top}\boldsymbol{\beta}_k+\phi_i,\ \sigma_k^2\Big),
+\qquad i=1,\dots,N\\[2mm]
+\boldsymbol{\pi} &\sim \mathrm{Dirichlet}\!\big(0.5\,\mathbf{1}_K\big),\\
+\alpha &\sim \mathcal{N}(0,2),\\
+\beta_{j,k}\mid b_{j,k},\lambda_{j}
+&\stackrel{\text{ind}}{\sim} \mathcal{N}\!\Big(b_{j,k},\ \lambda_{j} \Big),
+\qquad j=1,\dots,P,\ k=1,\dots,K\\
+b_{j} &\stackrel{\text{iid}}{\sim} \mathcal{N}(0,1),
+\qquad j=1,\dots,P\\
+\lambda_{j} &\stackrel{\text{iid}}{\sim} \mathrm{Gamma}(0.5,0.5), \,
+\qquad j=1,\dots,P\\
+\sigma^2_k = \frac{1}{\nu_k}, \qquad \nu_k &\stackrel{\text{iid}}{\sim} \mathrm{Gamma}(2,1),
+\qquad k=1,\dots,K\\
+\phi_i &= \phi_{\mathrm{raw},i}-\frac1N\sum_{i'=1}^N \phi_{\mathrm{raw},i'},
+\qquad i=1,\dots,N\\
+\boldsymbol{\phi}_{\mathrm{raw}}\mid \tau,\rho,W
+&\sim \mathcal{N}_N\!\Big(
+\mathbf{0},\ \big[\tau\{\rho(D-W)+(1-\rho)I_N\}\big]^{-1}
+\Big),\\
+\tau &\sim \mathrm{Gamma}(2,1),\\
+\rho &\sim \mathrm{Beta}(1,1).
+\end{align*}
+
+\subsubsection{Posterior Cluster Allocation in \texttt{Stan}}
+Let $z_i \in \{1,\dots,K\}$ denote the latent label of province $i$. For each province $i$ and component $k$, we compute the component-specific mean:
+\[
+\mu_{ik} \;=\; \alpha + \mathbf{x}_i^{*\top}\boldsymbol{\beta}_k + \phi_i, \qquad i=1,\dots,N,\ k=1,\dots,K
+\]
+We then compute the unnormalized allocation weights:
+\[
+w_{ik} \;=\; \pi_k\, \mathcal{N}\!\big(y_i^* \mid \mu_{ik}, \sigma_k^2\big), 
+\qquad i=1,\dots,N,\ k=1,\dots,K
+\]
+and normalize them to obtain probabilities:
+\[
+r_{ik} \;=\; \frac{w_{ik}}{\sum_{h=1}^K w_{ih}},
+\qquad i=1,\dots,N,\ k=1, \dots,K
+\]
+Finally, we sample the label as:
+\[
+z_i \mid \mathbf{r}_i \;\sim\; \mathrm{Categorical}(\mathbf{r}_i),
+\qquad i=1,\dots,N
+\]
+where $\mathbf{r}_i=(r_{i1},\dots,r_{iK})$.
+This produces one complete label vector $\mathbf{z}=(z_1,\dots,z_N)$ for each posterior draw.
+
+\subsubsection{Posterior Similarity Matrix}
+Directly averaging the labels over iterations is not meaningful, since component labels can switch across draws.
+A standard label-invariant summary is the posterior similarity matrix (PSM), defined by:
+\[
+S_{ii'} \;=\; \Pr(z_i=z_{i'} \mid \text{data}), \qquad 1\le i<i'\le N
+\]
+Let $\mathbf{z}^{(1)},\dots,\mathbf{z}^{(M)}$ be the $M$ label draws obtained from the procedure above.
+We estimate the PSM by:
+\[
+\widehat{S}_{ii'}
+\;=\;
+\frac{1}{M}\sum_{m=1}^M \mathbb{I}\!\left(z_i^{(m)} = z_{i'}^{(m)}\right), \qquad 1\le i<i'\le N
+\]
+Large values of $\widehat{S}_{ii'}$ indicate that provinces $i$ and $i'$ are frequently assigned to the same cluster in the posterior.
+
+\subsubsection{Point Estimate of the Partition via Binder Loss}
+
+For interpretation we need a single representative partition.
+We obtain it by minimizing the posterior expected Binder loss \cite{Binder_1978}.
+Given a candidate label vector $\hat{\mathbf{z}}$, the Binder loss is
+\[
+L_{\mathrm{Binder}}(\mathbf{z},\hat{\mathbf{z}})
+\;=\;
+\sum_{i<i'}
+\Big(
+a\,\mathbb{I}(z_i=z_{i'})\,\mathbb{I}(\hat{z}_i\neq \hat{z}_{i'})
+\;+\;
+b\,\mathbb{I}(z_i\neq z_{i'})\,\mathbb{I}(\hat{z}_i=\hat{z}_{i'})
+\Big),
+\]
+where $a>0$ is the cost of incorrectly separating a pair and $b>0$ is the cost of incorrectly merging a pair.
+The posterior expectation of $L_{\mathrm{Binder}}$ depends on the PSM.
+Using $S_{ii'}=\Pr(z_i=z_{i'}\mid\text{data})$, we have
+\[
+\mathbb{E}\!\left[L_{\mathrm{Binder}}(\mathbf{z},\hat{\mathbf{z}})\mid \text{data}\right]
+=
+\sum_{i<i'}
+\Big(
+a\,S_{ii'}\,\mathbb{I}(\hat{z}_i\neq \hat{z}_{i'})
++
+b\,(1-S_{ii'})\,\mathbb{I}(\hat{z}_i=\hat{z}_{i'})
+\Big).
+\]
+Minimizing the posterior expected Binder loss defines the optimal partition $\hat{\mathbf{z}}$. The resulting partition defines the final cluster labels used in the next subsection.
+
+\subsection{Full Hierarchical Model}
+\label{subsec:full_model}
+Let $C$ be the number of non-empty clusters in the chosen partition $\hat{\mathbf z}$ and denote by $c_i \in \{1,\dots,C\}$ the assigned cluster for province $i$.
+Conditional on $\mathbf c=(c_1,\dots,c_N)$, the mixture representation is no longer needed and the
+model becomes a standard hierarchical regression with cluster-specific parameters.
+In particular, each cluster $c$ is associated with a coefficient vector $\boldsymbol{\beta}_c$
+and a residual scale $\sigma_c$.
+
+
+
+\begin{align*}
+y_i^\ast \mid \alpha,\boldsymbol{\beta}_{c_i},\phi_i,\sigma_{c_i}
+&\stackrel{\text{ind}}{\sim} \mathcal{N}\!\Big(\alpha+\mathbf{x}_i^{\ast\top}\boldsymbol{\beta}_{c_i}+\phi_i,\ \sigma_{c_i}^{2}\Big),
+\qquad i=1,\dots,N\\[2mm]
+\alpha &\sim \mathcal{N}(0,2),\\
+\beta_{j,c}\mid b_{j,c},\lambda_{j}
+&\stackrel{\text{ind}}{\sim} \mathcal{N}\!\Big(b_{j,c},\ \lambda_{j} \Big),
+\qquad j=1,\dots,P,\ c=1,\dots,C\\
+b_{j,c} &\stackrel{\text{iid}}{\sim} \mathcal{N}(0,1),
+\qquad j=1,\dots,P,\ c = 1,\dots,C\\
+\lambda_{j} &\stackrel{\text{iid}}{\sim} \mathrm{Gamma}(0.5,0.5), \,
+\qquad j=1,\dots,P\\
+\sigma^2_c = \frac{1}{\nu_c}, \qquad \nu_c &\stackrel{\text{iid}}{\sim} \mathrm{Gamma}(2,1),
+\qquad c=1,\dots,C\\
+\phi_i &= \phi_{\mathrm{raw},i}-\frac1N\sum_{i'=1}^N \phi_{\mathrm{raw},i'} \, ,
+\qquad i=1,\dots,N\\
+\boldsymbol{\phi}_{\mathrm{raw}}\mid \tau,\rho,W
+&\sim \mathcal{N}_N\!\Big(
+\mathbf{0},\ \big[\tau\{\rho(D-W)+(1-\rho)I_N\}\big]^{-1}
+\Big),\\
+\tau &\sim \mathrm{Gamma}(2,1),\\
+\rho &\sim \mathrm{Beta}(1,1).
+\end{align*}

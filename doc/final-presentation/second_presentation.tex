@@ -1,0 +1,71 @@
+\documentclass[12pt,aspectratio=169]{beamer}
+\usetheme{aurigapolimi}
+
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+% % % % METADATA % % % % % % % % % % % % 
+
+\title{Clustering of Spatial Data}
+\subtitle{An application to early childhood education and care
+services and their impact on women’s labour market}
+\author{
+  Tommaso Baresi, 
+  Luca Perego, 
+  Paul Poupeau, \\
+  Leonardo Tisato,
+  Alexis Toppé,
+  Anh Chi Tuan} 
+
+\institute{February 19\textsuperscript{\tiny{th}}, 2026 }
+\setaurigadate{}
+\selectcolor{deepBluePolimi} % lighter polimi blue also available (bluePolimi)
+
+
+% = = = = = = = = = = = = = = = = = = = =
+% Set up logos = = = = = = = = = = = = =
+% = = = = = = = = = = = = = = = = = = = =
+
+% Title-page logos
+\setaurigatitlelogoA{logos/polimi_logo.eps}
+\setaurigatitlelogoheightA{1.5cm}
+
+%\setaurigatitlelogoB{logos/uab_text.eps}
+%\setaurigatitlelogoheightB{1.8cm}
+
+% Slide logos
+\setaurigalogoA{logos/polimi_logo.eps}
+\setaurigalogoheightA{0.5cm}
+
+%\setaurigalogoB{logos/}
+\setaurigalogoheightB{}
+
+\begin{document}
+\aurigatitleframe
+
+\newcommand{\iid}{\stackrel{\tiny{iid}}{\sim}}
+\newcommand{\ind}{\stackrel{\tiny{ind}}{\sim}}
+
+\include{slides_second_presentation/0_Introduction}
+
+\include{slides_first_presentation/1_dataset}
+
+\include{slides_second_presentation/2_eda}
+
+\include{slides_second_presentation/3_var_selection}
+
+\include{slides_second_presentation/4_clustering}
+
+\include{slides_second_presentation/5_results}
+
+\include{slides_second_presentation/7_conclusion}
+
+\include{slides_second_presentation/6_simulation}
+
+\include{slides_second_presentation/8_Appendix}
+
+\include{slides_second_presentation/9_bibliography}
+
+
+
+\end{document}
+

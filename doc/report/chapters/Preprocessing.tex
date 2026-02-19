@@ -1,0 +1,16 @@
+\section{Preprocessing}
+\label{sec:preprocessing}
+
+Before fitting the models, we preprocess the data to make covariates comparable. Since predictors are measured on different scales, we standardize them using their sample means and standard deviations. In the rest of the analysis, we use the standardized predictors $X_{ij}^*$, for the j-th variable of the i-th province:
+
+\begin{equation}
+    X_{ij}^* = {{X_{ij} - \bar X_j} \over {s_{X_j}}}, \hspace{1cm} i = 1,..,N,  \hspace{0.5cm} j = 1,...,P
+\end{equation}
+
+Since the response $y_i = \texttt{fem\_empl\_rate}_i$ is a proportion, it takes values in $(0,1)$. To model it with a linear predictor, we apply a link function that maps $(0,1)$ to $\mathbb R$. In particular, we use the logit link, so we can model $y_i^*$ with a standard linear predictor:
+
+\begin{equation}
+    y_i^* = logit(y_i) = \log \bigg( {y_i \over {1 - y_i}} \bigg), \hspace{1cm} i = 1,...,N
+\end{equation}
+
+Unless otherwise stated, these preprocessing choices are adopted for the rest of the analysis.

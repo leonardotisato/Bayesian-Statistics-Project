@@ -1,0 +1,64 @@
+\section{Variable selection} 
+
+\begin{frame}{Variable Selection}
+Goal : identify the most relevant predictors.\\
+
+\vspace{0.5cm}
+1. Remove variables considered irrelevant by the sociological literature (ex : \texttt{urban\_type}, \texttt{area\_km2}, ...);\\
+% 2. Drop the variables with a Pearson or Spearman’s correlation coefficient $|\rho_{ij} | \leq 0.85$ with women’s employment rate
+\vspace{0.5cm}
+2. Remove variables highly correlated with the female employment rate ($|\rho | \geq 0.85$), as they partially convey the same information (ex : \texttt{empl\_rate}, \texttt{unempl\_rate}, \texttt{fem\_house\_rate}, ...)
+
+
+\end{frame}
+
+
+\begin{frame}{Variable Selection}
+3. Mitigate multicollinearity inside the ECEC group and Non-ECEC group\\
+\vspace{0.5cm}
+\begin{center}
+    \includegraphics[scale=0.35]{pictures_second_presentation/illus_variable_selec.png}
+\end{center}
+
+
+
+\end{frame}
+
+
+
+
+\begin{frame}{Bayesian Lasso}
+\footnotesize
+\begin{align*}
+    y^{\ast}_i \mid \boldsymbol{\beta}, \sigma, \phi_i 
+        &\stackrel{\text{ind}}{\sim}\mathcal{N}\big(\alpha + \phi_i +  \boldsymbol{x}_i^{\ast \top} \boldsymbol{\beta},\, \sigma^2\big) \, ,
+        \quad i = 1,\dots,N \\
+    \beta_j \mid \lambda, \sigma 
+        &\stackrel{\text{iid}}{\sim}\mathrm{Laplace}\big(0,\, \sigma / \lambda\big) \, ,
+        \quad j = 1,\dots,P \\
+    \lambda^2 &\sim \mathrm{Gamma}(2, 1), \\
+    \sigma &\sim \mathrm{HalfNormal}(1), \\
+    \alpha &\sim \mathcal{N}\big(0, \, 10^2),\\
+    \phi \mid \tau_c, \rho, W &\sim \mathcal{N}_N \big(\boldsymbol{0},[\tau_c (D -\rho W)]^{-1} \big),\\
+    \rho &\sim \mathrm{Beta}(2,2),\\
+    \tau_c &\sim \mathrm{Gamma}(1,1).\\
+\end{align*}  
+
+Selection criterion : 95\% credible interval does \underline{not} contain $0$
+
+\end{frame}
+
+\begin{frame}{Selection Results}
+    \begin{center}
+         \includegraphics[scale=0.47]{pictures_second_presentation/final_variable_selection.png}
+    \end{center}
+         
+         \footnotesize \textbf{Selected Variables} \scriptsize
+         \begin{itemize}
+             \item ECEC variables : \texttt{private\_coverage, public\_coverage}
+             \item Non-ECEC variables : \texttt{fem\_maj\_empl\_rate, service\_empl\_rate,\\ graduate\_mobility\_rate, empl\_growth}
+         \end{itemize}
+
+\end{frame}
+
+

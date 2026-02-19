@@ -19,3 +19,4 @@ Bayesian-Statistics-Project.Rproj
 *.exe
 *.stan
 *.pkl
+*.txt
